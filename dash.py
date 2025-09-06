@@ -7,6 +7,7 @@ from plotly.subplots import make_subplots
 
 # Page configuration
 st.set_page_config(page_title="UK MOD Spend Analysis", page_icon="📊", layout="wide")
+# 作者信息
 
 # Load data
 @st.cache_data
@@ -19,6 +20,11 @@ df = load_data()
 
 # Title and introduction
 st.title("🏛️ UK Ministry of Defence Spend Analysis Dashboard")
+st.markdown("""
+**Author:** CHEN JUNG-LU  
+**Email:** E1582484@u.nus.edu 
+""")
+
 st.markdown("""
 ### Executive Summary
 This dashboard provides comprehensive analysis of UK Ministry of Defence procurement spending data. 
