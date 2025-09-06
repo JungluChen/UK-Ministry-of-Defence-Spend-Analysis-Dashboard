@@ -7,7 +7,6 @@ from plotly.subplots import make_subplots
 
 # Page configuration
 st.set_page_config(page_title="UK MOD Spend Analysis", page_icon="📊", layout="wide")
-# 作者信息
 
 # Load data
 @st.cache_data
@@ -108,13 +107,11 @@ with st.expander("🔍 **Data Filters** - Click to customize your analysis", exp
                 default=df['Expense Area (User/BU)'].unique()
             )
 
-    # 创建过滤后的数据框
     filtered_df = df[
         (df['Expense Type (Category)'].isin(selected_categories)) &
         (df['Expense Area (User/BU)'].isin(selected_areas))
     ].copy()
 
-    # 确保数值类型正确并清理数据
     filtered_df['Invoice Value (GBP)'] = pd.to_numeric(filtered_df['Invoice Value (GBP)'], errors='coerce')
     filtered_df = filtered_df.dropna(subset=['Invoice Value (GBP)'])
     filtered_df = filtered_df[filtered_df['Invoice Value (GBP)'] >= 0]
@@ -125,21 +122,21 @@ with st.expander("🔍 **Data Filters** - Click to customize your analysis", exp
             st.rerun()
         
         st.markdown("**📊 Quick Stats**")
-        # 计算选中记录占比
+
         selected_ratio = len(filtered_df) / len(df) * 100 if len(df) > 0 else 0
         st.metric("Selected/Total Records", f"{len(filtered_df):,}/{len(df):,} ({selected_ratio:.1f}%)")
         
-        # 计算选中类别占比
+
         selected_cat_ratio = len(set(filtered_df['Expense Type (Category)'])) / len(df['Expense Type (Category)'].unique()) * 100
         st.metric("Selected/Total Categories", 
                  f"{len(set(filtered_df['Expense Type (Category)']))}/{len(df['Expense Type (Category)'].unique())} ({selected_cat_ratio:.1f}%)")
         
-        # 计算选中区域占比
+
         selected_area_ratio = len(set(filtered_df['Expense Area (User/BU)'])) / len(df['Expense Area (User/BU)'].unique()) * 100
         st.metric("Selected/Total Areas",
                  f"{len(set(filtered_df['Expense Area (User/BU)']))}/{len(df['Expense Area (User/BU)'].unique())} ({selected_area_ratio:.1f}%)")
 
-# 显示数据加载状态
+
 if len(filtered_df) == 0:
     st.error("⚠️ No data matches your current filters. Please adjust your selection.")
     st.stop()
@@ -414,3 +411,4 @@ st.markdown("""
 - Use filters to focus analysis on specific categories or business areas
 - For questions about specific transactions, refer to the detailed data view
 """)
+
