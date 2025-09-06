@@ -7,6 +7,8 @@ from plotly.subplots import make_subplots
 
 # Page configuration
 st.set_page_config(page_title="UK MOD Spend Analysis", page_icon="📊", layout="wide")
+# 作者信息
+
 # Load data
 @st.cache_data
 def load_data():
@@ -25,7 +27,7 @@ st.markdown("""
 
 st.markdown("""
 ### Executive Summary
-This dashboard provides a comprehensive analysis of the UK Ministry of Defence procurement spending data. 
+This dashboard provides comprehensive analysis of UK Ministry of Defence procurement spending data. 
 Explore spending patterns across different categories, business units, and suppliers to identify 
 opportunities for cost optimization and strategic procurement decisions.
 """)
@@ -68,7 +70,7 @@ with st.expander("🔍 **Data Filters** - Click to customize your analysis", exp
             selected_categories = st.multiselect(
                 "Select categories:",
                 options=df['Expense Type (Category)'].unique(),
-                default=df['Expense Type (Category)'].unique()  # Changed from [:5] to select ALL
+                default=df['Expense Type (Category)'].unique()
             )
     
     with col2:
@@ -103,32 +105,46 @@ with st.expander("🔍 **Data Filters** - Click to customize your analysis", exp
             selected_areas = st.multiselect(
                 "Select areas:",
                 options=df['Expense Area (User/BU)'].unique(),
-                default=df['Expense Area (User/BU)'].unique()  # Changed from [:5] to select ALL
+                default=df['Expense Area (User/BU)'].unique()
             )
-    
+
+    # 创建过滤后的数据框
+    filtered_df = df[
+        (df['Expense Type (Category)'].isin(selected_categories)) &
+        (df['Expense Area (User/BU)'].isin(selected_areas))
+    ].copy()
+
+    # 确保数值类型正确并清理数据
+    filtered_df['Invoice Value (GBP)'] = pd.to_numeric(filtered_df['Invoice Value (GBP)'], errors='coerce')
+    filtered_df = filtered_df.dropna(subset=['Invoice Value (GBP)'])
+    filtered_df = filtered_df[filtered_df['Invoice Value (GBP)'] >= 0]
+
     with col3:
         st.markdown("**⚙️ Actions**")
         if st.button("🔄 Reset Filters", help="Reset all filters to default"):
             st.rerun()
         
         st.markdown("**📊 Quick Stats**")
-        st.metric("Total Records", f"{len(df):,}")
-        st.metric("Categories", len(df['Expense Type (Category)'].unique()))
-        st.metric("Areas", len(df['Expense Area (User/BU)'].unique()))
+        # 计算选中记录占比
+        selected_ratio = len(filtered_df) / len(df) * 100 if len(df) > 0 else 0
+        st.metric("Selected/Total Records", f"{len(filtered_df):,}/{len(df):,} ({selected_ratio:.1f}%)")
+        
+        # 计算选中类别占比
+        selected_cat_ratio = len(set(filtered_df['Expense Type (Category)'])) / len(df['Expense Type (Category)'].unique()) * 100
+        st.metric("Selected/Total Categories", 
+                 f"{len(set(filtered_df['Expense Type (Category)']))}/{len(df['Expense Type (Category)'].unique())} ({selected_cat_ratio:.1f}%)")
+        
+        # 计算选中区域占比
+        selected_area_ratio = len(set(filtered_df['Expense Area (User/BU)'])) / len(df['Expense Area (User/BU)'].unique()) * 100
+        st.metric("Selected/Total Areas",
+                 f"{len(set(filtered_df['Expense Area (User/BU)']))}/{len(df['Expense Area (User/BU)'].unique())} ({selected_area_ratio:.1f}%)")
 
-# Apply filters
-filtered_df = df[
-    (df['Expense Type (Category)'].isin(selected_categories)) &
-    (df['Expense Area (User/BU)'].isin(selected_areas))
-]
-
-# Data loading status
+# 显示数据加载状态
 if len(filtered_df) == 0:
     st.error("⚠️ No data matches your current filters. Please adjust your selection.")
     st.stop()
 else:
     st.success(f"✅ Loaded {len(filtered_df):,} records matching your filters ({len(filtered_df)/len(df)*100:.1f}% of total data)")
-
 # Main Dashboard Content
 st.markdown("---")
 
@@ -398,4 +414,3 @@ st.markdown("""
 - Use filters to focus analysis on specific categories or business areas
 - For questions about specific transactions, refer to the detailed data view
 """)
-
