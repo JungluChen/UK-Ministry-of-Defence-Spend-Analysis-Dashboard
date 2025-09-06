@@ -7,8 +7,6 @@ from plotly.subplots import make_subplots
 
 # Page configuration
 st.set_page_config(page_title="UK MOD Spend Analysis", page_icon="📊", layout="wide")
-# 作者信息
-
 # Load data
 @st.cache_data
 def load_data():
@@ -27,7 +25,7 @@ st.markdown("""
 
 st.markdown("""
 ### Executive Summary
-This dashboard provides comprehensive analysis of UK Ministry of Defence procurement spending data. 
+This dashboard provides a comprehensive analysis of the UK Ministry of Defence procurement spending data. 
 Explore spending patterns across different categories, business units, and suppliers to identify 
 opportunities for cost optimization and strategic procurement decisions.
 """)
@@ -400,3 +398,4 @@ st.markdown("""
 - Use filters to focus analysis on specific categories or business areas
 - For questions about specific transactions, refer to the detailed data view
 """)
+
